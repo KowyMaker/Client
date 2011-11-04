@@ -7,26 +7,6 @@
 	<name>Kowy Maker - Client</name>
 	<dependencies>
         <dependency>
-            <groupId>org.lwjgl</groupId>
-            <artifactId>lwjgl</artifactId>
-            <version>2.7.1</version>
-        </dependency>
-        <dependency>
-        	<groupId>org.lwjgl</groupId>
-        	<artifactId>lwjgl-util</artifactId>
-        	<version>2.7.1</version>
-        </dependency>
-        <dependency>
-        	<groupId>net.java.games</groupId>
-        	<artifactId>jinput</artifactId>
-        	<version>2.7.1</version>
-        </dependency>
-        <dependency>
-        	<groupId>org.jboss.netty</groupId>
-        	<artifactId>netty</artifactId>
-        	<version>3.2.5.Final</version>
-        </dependency>
-        <dependency>
         	<groupId>org.fenggui</groupId>
         	<artifactId>fenggui</artifactId>
         	<version>2.0</version>
@@ -37,12 +17,6 @@
         	<version>0.1.0</version>
         </dependency>
 	</dependencies>
-	<distributionManagement>
-		<repository>
-			<id>kokabsolu</id>
-			<url>ftp://188.40.41.225/public_html/maven/maven2/</url>
-		</repository>
-	</distributionManagement>
 	<repositories>
 	   <repository>
 	       <id>kokabsolu-repo</id>
