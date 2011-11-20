@@ -52,7 +52,8 @@
 							<artifactSet>
 								<excludes>
 									<exclude>junit:junit</exclude>
-									<exclude>org.lwjgl:*</exclude>
+                                    <exclude>net.java.jinput:jinput-platform</exclude>
+                                    <exclude>org.lwjgl.lwjgl:lwjgl-platform</exclude>
 								</excludes>
 							</artifactSet>
 							<filters>
@@ -74,8 +75,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.0.2</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.5</source>
+					<target>1.5</target>
 				</configuration>
 			</plugin>
 		</plugins>
