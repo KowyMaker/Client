@@ -6,32 +6,38 @@
 	<version>0.1.0</version>
 	<name>Kowy Maker - Client</name>
 	<dependencies>
-        <dependency>
-        	<groupId>org.fenggui</groupId>
-        	<artifactId>fenggui</artifactId>
-        	<version>2.0</version>
-        </dependency>
-        <dependency>
-        	<groupId>com.kowymaker.spec</groupId>
-        	<artifactId>kowymaker-specification</artifactId>
-        	<version>0.1.0</version>
-        </dependency>
+		<dependency>
+			<groupId>org.fenggui</groupId>
+			<artifactId>fenggui</artifactId>
+			<version>2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.kowymaker.spec</groupId>
+			<artifactId>kowymaker-specification</artifactId>
+			<version>0.1.0</version>
+		</dependency>
 	</dependencies>
 	<repositories>
-	   <repository>
-	       <id>kokabsolu-repo</id>
-	       <url>http://maven.kokabsolu.com/maven2/</url>
-	   </repository>
+		<repository>
+			<id>kokabsolu-repo</id>
+			<url>http://maven.kokabsolu.com/maven2/</url>
+		</repository>
 	</repositories>
 	<build>
 		<finalName>kowymaker-client-${project.version}</finalName>
+		<sourceDirectory>${basedir}/src/main/java</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.1</version>
+				<version>2.3.1</version>
 				<configuration>
+					<addMavenDescriptor>true</addMavenDescriptor>
 					<archive>
+						<manifest>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
 						<manifestEntries>
 							<Main-Class>com.kowymaker.client.KowyMakerClient</Main-Class>
 						</manifestEntries>
@@ -52,8 +58,8 @@
 							<artifactSet>
 								<excludes>
 									<exclude>junit:junit</exclude>
-                                    <exclude>net.java.jinput:jinput-platform</exclude>
-                                    <exclude>org.lwjgl.lwjgl:lwjgl-platform</exclude>
+									<exclude>net.java.jinput:jinput-platform</exclude>
+									<exclude>org.lwjgl.lwjgl:lwjgl-platform</exclude>
 								</excludes>
 							</artifactSet>
 							<filters>
@@ -79,7 +85,31 @@
 					<target>1.5</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>${assemblyPlugin.version}</version>
+				<configuration>
+					<descriptors>
+						<descriptor>${basedir}/src/main/assembly/assembly.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id> <!-- this is used for inheritance merges -->
+						<phase>package</phase> <!-- bind to the packaging phase -->
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	<url>http://www.kowymaker.com</url>
+
+	<properties>
+		<assemblyPlugin.version>2.2.2</assemblyPlugin.version>
+		<releasePlugin.version>2.2.2</releasePlugin.version>
+	</properties>
 </project>

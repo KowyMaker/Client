@@ -1,6 +1,7 @@
 package com.kowymaker.client;
 
 import java.io.File;
+import java.io.IOException;
 
 import com.kowymaker.client.graphics.ClientWindow;
 import com.kowymaker.spec.utils.Configuration;
@@ -26,6 +27,14 @@ public class KowyMakerClient
         
         File nativesDir = new File("natives" + File.separator
                 + SystemUtils.getSystemOS().name());
+        try
+        {
+            System.out.println(nativesDir.getCanonicalPath());
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
         System.setProperty("org.lwjgl.librarypath",
                 nativesDir.getAbsolutePath());
         System.setProperty("net.java.games.input.librarypath",
