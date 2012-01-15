@@ -1,5 +1,6 @@
 package com.kowymaker.client.graphics;
 
+import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -9,23 +10,31 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.JFrame;
+
+import org.lwjgl.LWJGLException;
+import org.lwjgl.opengl.AWTGLCanvas;
+
 import com.kowymaker.client.KowyMakerClient;
 import com.kowymaker.client.graphics.core.ClientEngine;
 
-public class ClientWindow extends Frame
+public class ClientWindow extends JFrame
 {
     private static final long     serialVersionUID = 1111824300511792902L;
     
     private final KowyMakerClient client;
     
-    private final Canvas          canvas           = new Canvas();
+    private final AWTGLCanvas     canvas;
     private final ClientEngine    engine           = new ClientEngine();
     private final Thread          thread;
     
-    public ClientWindow(final KowyMakerClient client) throws HeadlessException
+    public ClientWindow(final KowyMakerClient client) throws HeadlessException,
+            LWJGLException
     {
         // Init window & variables
         super();
+        
+        canvas = new AWTGLCanvas();
         this.client = client;
         engine.setContext(canvas);
         thread = new Thread(engine);
@@ -34,14 +43,15 @@ public class ClientWindow extends Frame
         canvas.setSize(client.getConfiguration().getInteger("graphics.width"),
                 client.getConfiguration().getInteger("graphics.height"));
         
-        setLayout(null);
-        add(canvas);
+        getContentPane().setLayout(new BorderLayout());
+        getContentPane().add(canvas, BorderLayout.CENTER);
         
         setTitle(client.getConfiguration().getString("game.name"));
         
-        setPreferredSize(new Dimension(client.getConfiguration().getInteger(
-                "graphics.width"), client.getConfiguration().getInteger(
-                "graphics.height")));
+        getContentPane().setPreferredSize(
+                new Dimension(client.getConfiguration().getInteger(
+                        "graphics.width"), client.getConfiguration()
+                        .getInteger("graphics.height")));
         pack();
         setLocationRelativeTo(null);
         
@@ -56,13 +66,12 @@ public class ClientWindow extends Frame
             
         });
         
-        addComponentListener(new ComponentAdapter() {
+        getContentPane().addComponentListener(new ComponentAdapter() {
             
             @Override
             public void componentResized(ComponentEvent e)
             {
-                engine.resize(getWidth(), getHeight());
-                canvas.setSize(getSize());
+                engine.resize(canvas.getWidth(), canvas.getHeight());
             }
             
         });

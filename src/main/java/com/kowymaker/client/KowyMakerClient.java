@@ -1,7 +1,7 @@
 package com.kowymaker.client;
 
 import java.io.File;
-import java.io.IOException;
+
 
 import com.kowymaker.client.graphics.ClientWindow;
 import com.kowymaker.spec.console.ConsoleOutputManager;
@@ -14,7 +14,7 @@ public class KowyMakerClient
     
     private final ClientWindow  window;
     
-    public KowyMakerClient()
+    public KowyMakerClient() throws Exception
     {
         ConsoleOutputManager.register("client");
         
@@ -63,8 +63,15 @@ public class KowyMakerClient
      */
     public static void main(String[] args)
     {
-        KowyMakerClient client = new KowyMakerClient();
-        client.start();
+        try
+        {
+            KowyMakerClient client = new KowyMakerClient();
+            client.start();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
     
 }

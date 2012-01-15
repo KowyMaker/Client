@@ -1,6 +1,7 @@
 package com.kowymaker.client;
 
 import org.fenggui.binding.render.lwjgl.LWJGLOpenGL;
+import org.fenggui.binding.render.lwjgl.LWJGLTexture;
 
 import com.kowymaker.client.graphics.core.ClientEngine;
 import com.kowymaker.client.graphics.core.IChild;
