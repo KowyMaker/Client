@@ -1,113 +1,81 @@
 package com.kowymaker.client.graphics;
 
 import java.awt.BorderLayout;
-import java.awt.Canvas;
-import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.HeadlessException;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 
-import javax.swing.JFrame;
+import javax.imageio.ImageIO;
 
 import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.AWTGLCanvas;
 
 import com.kowymaker.client.KowyMakerClient;
-import com.kowymaker.client.graphics.core.ClientEngine;
+import com.kowymaker.client.graphics.core.ClientApplet;
 
-public class ClientWindow extends JFrame
+public class ClientWindow extends Frame
 {
     private static final long     serialVersionUID = 1111824300511792902L;
     
-    private final KowyMakerClient client;
+    private final KowyMakerClient main;
+    private final ClientApplet    applet;
     
-    private final AWTGLCanvas     canvas;
-    private final ClientEngine    engine           = new ClientEngine();
-    private final Thread          thread;
-    
-    public ClientWindow(final KowyMakerClient client) throws HeadlessException,
+    public ClientWindow(final KowyMakerClient main) throws HeadlessException,
             LWJGLException
     {
-        // Init window & variables
-        super();
+        super(main.getConfig().getString("game.name"));
+        this.main = main;
+        applet = new ClientApplet(
+                main.getConfig().getInteger("graphics.width"), main.getConfig()
+                        .getInteger("graphics.height"));
         
-        canvas = new AWTGLCanvas();
-        this.client = client;
-        engine.setContext(canvas);
-        thread = new Thread(engine);
+        try
+        {
+            setIconImage(ImageIO.read(ClientWindow.class
+                    .getResourceAsStream("/res/icon.png")));
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        setLayout(new BorderLayout());
         
-        // Init display
-        canvas.setSize(client.getConfiguration().getInteger("graphics.width"),
-                client.getConfiguration().getInteger("graphics.height"));
-        
-        getContentPane().setLayout(new BorderLayout());
-        getContentPane().add(canvas, BorderLayout.CENTER);
-        
-        setTitle(client.getConfiguration().getString("game.name"));
-        
-        getContentPane().setPreferredSize(
-                new Dimension(client.getConfiguration().getInteger(
-                        "graphics.width"), client.getConfiguration()
-                        .getInteger("graphics.height")));
-        pack();
-        setLocationRelativeTo(null);
-        
-        // Init listeners
         addWindowListener(new WindowAdapter() {
-            
             @Override
             public void windowClosing(WindowEvent e)
             {
-                client.stop();
+                main.stop();
             }
-            
         });
         
-        getContentPane().addComponentListener(new ComponentAdapter() {
-            
-            @Override
-            public void componentResized(ComponentEvent e)
-            {
-                engine.resize(canvas.getWidth(), canvas.getHeight());
-            }
-            
-        });
+        add(applet, BorderLayout.CENTER);
+        
+        pack();
+        setLocationRelativeTo(null);
     }
     
-    public KowyMakerClient getClient()
+    public void start()
     {
-        return client;
+        applet.start();
+        setVisible(true);
     }
     
-    public Canvas getCanvas()
+    public void stop()
     {
-        return canvas;
+        setVisible(false);
+        applet.stop();
     }
     
-    public ClientEngine getEngine()
+    public KowyMakerClient getMain()
     {
-        return engine;
+        return main;
     }
     
-    public Thread getThread()
+    public ClientApplet getApplet()
     {
-        return thread;
-    }
-    
-    @Override
-    public void setVisible(boolean b)
-    {
-        if (b)
-        {
-            thread.start();
-        }
-        else
-        {
-            engine.setRunning(false);
-        }
-        super.setVisible(b);
+        return applet;
     }
 }

@@ -7,41 +7,130 @@ import java.util.List;
 import org.fenggui.binding.render.lwjgl.LWJGLOpenGL;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 
 public class ClientEngine implements Runnable
 {
-    private Object                    context;
-    private boolean                   useDisplay    = false;
-    private boolean                   running       = false;
-    private boolean                   updateDisplay = false;
+    private int                width;
+    private int                height;
     
-    private final LWJGLOpenGL         gl            = new LWJGLOpenGL();
+    private Object             context    = null;
+    private boolean            running    = false;
+    private boolean            useDisplay = false;
+    private boolean            updateSize = false;
     
-    private final EngineConfiguration configuration = new EngineConfiguration();
+    private final LWJGLOpenGL  gl         = new LWJGLOpenGL();
     
-    private final List<IChild>        childs        = new ArrayList<IChild>();
+    private final List<IChild> childs     = new ArrayList<IChild>();
     
-    public Object getContext()
+    public ClientEngine(int width, int height)
     {
-        return context;
+        this.width = width;
+        this.height = height;
     }
     
-    public void setContext(Object context)
+    public void run()
     {
-        this.context = context;
+        try
+        {
+            initGL();
+            
+            running = true;
+            
+            while (running)
+            {
+                loop();
+            }
+        }
+        catch (LWJGLException e)
+        {
+            e.printStackTrace();
+        }
     }
     
-    public boolean isUseDisplay()
+    private void initGL() throws LWJGLException
     {
-        return useDisplay;
+        if (context != null)
+        {
+            if (context instanceof Canvas)
+            {
+                Display.setParent((Canvas) context);
+                
+                Display.setVSyncEnabled(true);
+                Display.create();
+                
+                useDisplay = true;
+            }
+            else
+            {
+                GLContext.useContext(context);
+            }
+        }
+        
+        gl.setProjectionMatrixMode();
+        gl.loadIdentity();
+        
+        gl.setOrtho(0, width, 0, height, -1, 1);
+        gl.setViewPort(0, 0, width, height);
+        
+        gl.setModelMatrixMode();
+        gl.loadIdentity();
+        
+        gl.enableTexture2D(true);
     }
     
-    public void setUseDisplay(boolean useDisplay)
+    private void loop()
     {
-        this.useDisplay = useDisplay;
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+        
+        update();
+        render();
+        
+        if (useDisplay)
+        {
+            Display.update();
+        }
+        
+        if (updateSize)
+        {
+            gl.setProjectionMatrixMode();
+            gl.loadIdentity();
+            
+            gl.setOrtho(0, width, 0, height, -1, 1);
+            gl.setViewPort(0, 0, width, height);
+            
+            updateSize = false;
+        }
+        
+        gl.setModelMatrixMode();
+        gl.loadIdentity();
+    }
+    
+    private void update()
+    {
+        for (IChild child : childs)
+        {
+            child.update(this);
+        }
+    }
+    
+    private void render()
+    {
+        for (IChild child : childs)
+        {
+            child.render(this);
+        }
+    }
+    
+    public void addChild(IChild child)
+    {
+        childs.add(child);
+    }
+    
+    public List<IChild> getChilds()
+    {
+        return childs;
     }
     
     public boolean isRunning()
@@ -54,137 +143,27 @@ public class ClientEngine implements Runnable
         this.running = running;
     }
     
+    public Object getContext()
+    {
+        return context;
+    }
+    
+    public void setContext(Object context)
+    {
+        this.context = context;
+    }
+    
     public LWJGLOpenGL getGl()
     {
         return gl;
     }
     
-    public EngineConfiguration getConfiguration()
-    {
-        return configuration;
-    }
-    
-    public boolean isUpdateDisplay()
-    {
-        return updateDisplay;
-    }
-    
-    public void setUpdateDisplay(boolean updateDisplay)
-    {
-        this.updateDisplay = updateDisplay;
-    }
-    
-    public void addChild(IChild child)
-    {
-        if (!childs.contains(child))
-        {
-            childs.add(child);
-        }
-    }
-    
-    public void removeChild(int index)
-    {
-        childs.remove(index);
-    }
-    
-    public void removeChild(IChild child)
-    {
-        childs.remove(child);
-    }
-    
-    public List<IChild> getChilds()
-    {
-        return childs;
-    }
-    
     public void resize(int width, int height)
     {
-        configuration.setWidth(width);
-        configuration.setHeight(height);
+        this.width = width;
+        this.height = height;
         
-        updateDisplay = true;
-    }
-    
-    public void run()
-    {
-        initGL();
-        running = true;
-        while (running)
-        {
-            loop();
-        }
-    }
-    
-    public void loop()
-    {
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-        
-        update();
-        render();
-        
-        if (useDisplay)
-        {
-            Display.update();
-        }
-        
-        EngineConfiguration.clear();
-        
-        if (useDisplay)
-        {
-            Display.sync(configuration.getFps());
-        }
-    }
-    
-    public void initGL()
-    {
-        try
-        {
-            if (context instanceof Canvas)
-            {
-                Display.setParent((Canvas) context);
-                Canvas canvas = (Canvas) context;
-                configuration.setWidth(canvas.getWidth());
-                configuration.setHeight(canvas.getHeight());
-                
-                Display.setDisplayMode(new DisplayMode(
-                        configuration.getWidth(), configuration.getHeight()));
-                Display.setVSyncEnabled(true);
-                Display.create();
-                useDisplay = true;
-            }
-            else
-            {
-                GLContext.useContext(context);
-            }
-            
-            configuration.apply();
-        }
-        catch (LWJGLException e)
-        {
-            e.printStackTrace();
-        }
-    }
-    
-    public void update()
-    {
-        if (updateDisplay)
-        {
-            configuration.apply();
-            updateDisplay = false;
-        }
-        
-        for (IChild child : childs)
-        {
-            child.update(this);
-        }
-    }
-    
-    public void render()
-    {
-        for (IChild child : childs)
-        {
-            child.render(this);
-        }
+        updateSize = true;
     }
     
 }
