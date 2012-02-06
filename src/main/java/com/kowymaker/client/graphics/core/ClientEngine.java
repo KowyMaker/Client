@@ -1,12 +1,16 @@
 package com.kowymaker.client.graphics.core;
 
 import java.awt.Canvas;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.fenggui.binding.render.Graphics;
+import org.fenggui.binding.render.ImageFont;
 import org.fenggui.binding.render.lwjgl.LWJGLBinding;
 import org.fenggui.binding.render.lwjgl.LWJGLOpenGL;
 import org.fenggui.util.Color;
+import org.fenggui.util.fonttoolkit.FontFactory;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Mouse;
@@ -143,6 +147,12 @@ public class ClientEngine implements Runnable
         {
             child.render(this);
         }
+        
+        Graphics g = binding.getGraphics();
+        
+        g.setFont(ImageFont.getDefaultFont());
+        gl.color(Color.WHITE);
+        g.drawString("FPS: " + fps.getFps(), 0, 0);
     }
     
     public void addChild(IChild child)
@@ -259,10 +269,10 @@ public class ClientEngine implements Runnable
     
     public static class FPS
     {
-        private long last;
         
-        private int  count = 0;
-        private int  fps;
+        public int  current = 0;
+        public int  fps     = 0;
+        public long start   = 0;
         
         public long getTime()
         {
@@ -271,30 +281,18 @@ public class ClientEngine implements Runnable
         
         public void start()
         {
-            last = getTime();
-        }
-        
-        public long getDelta()
-        {
-            long time = getTime();
-            long delta = time - last;
-            
-            return delta;
+            start = getTime();
         }
         
         public void update()
         {
-            if (getDelta() > 0)
+            current++;
+            long time = getTime();
+            if (time - start >= 1000)
             {
-                if (getDelta() > 1000)
-                {
-                    count = 0;
-                    last += 1000;
-                }
-                
-                count++;
-                
-                fps = (int) (count / getDelta());
+                fps = current;
+                current = 0;
+                start = time;
             }
         }
         

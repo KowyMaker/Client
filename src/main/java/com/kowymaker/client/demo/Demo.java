@@ -53,7 +53,7 @@ public class Demo implements IChild
     
     public Demo(final KowyMakerClient main)
     {
-        generator = new WorldGenerator("hoy");
+        generator = new WorldGenerator("kq452f25fqfs*/q-s*/-sq*fs/q*+/qf");
         // On inscrit les biomes
         generator.registerBiome(OceanBiome.class);
         generator.registerBiome(SnowBiome.class);
@@ -266,16 +266,24 @@ public class Demo implements IChild
                 int tileX = x * (Tile.width / 2);
                 int tileY = y * (Tile.height / 2);
                 
-                double worldX = (tileX + baseX) * 0.07;
-                double worldY = (tileY + baseY) * 0.07;
+                double worldX = (tileX + baseX) * 0.15;
+                double worldY = (tileY + baseY) * 0.15;
                 
                 Biome biome = generator.getBiome(worldX, worldY);
                 java.awt.Color biomeColor = biome.getColor(worldX, worldY);
                 Color color = new Color(biomeColor.getRed(),
                         biomeColor.getGreen(), biomeColor.getBlue());
                 
-//                double temp = temperature.getValue(worldX, worldY) * 0.01;
-//                color = color.darker(MathsHelper.supervise(1 - Float.parseFloat(Double.toString(temp)), 0, 0.6f));
+                if(biome instanceof SnowBiome)
+                {
+                    double temp = temperature.getValue(worldX, worldY) * 0.01;
+                    color = color.brighter(MathsHelper.supervise(Float.parseFloat(Double.toString(temp)), 0, 0.2f));
+                }
+                else
+                {
+                    double temp = temperature.getValue(worldX, worldY) * 0.01;
+                    color = color.darker(MathsHelper.supervise(1 - Float.parseFloat(Double.toString(temp)), 0, 0.8f));
+                }
                 
                 double height = heightmap.getValue(worldX, worldY) * 10;
                 
@@ -405,7 +413,7 @@ public class Demo implements IChild
             
             gl.startQuads();
             
-            gl.color(color.darker(0.35f));
+            gl.color(color.darker(0.15f));
             gl.vertex(x, y + (height / 2));
             gl.vertex(x + (width / 2), y);
             gl.vertex(x + (width / 2), y - depth);
@@ -415,7 +423,7 @@ public class Demo implements IChild
             
             gl.startQuads();
             
-            gl.color(color.darker(0.35f));
+            gl.color(color.darker(0.15f));
             gl.vertex(x + (width / 2), y);
             gl.vertex(x + width, y + (height / 2));
             gl.vertex(x + width, y + (height / 2) - depth);
@@ -455,7 +463,8 @@ public class Demo implements IChild
                     }
                     else
                     {
-                        limitDownY = (height * (localX - (width / 2)) / width) - depth;
+                        limitDownY = (height * (localX - (width / 2)) / width)
+                                - depth;
                     }
                     
                     if (localY > limitDownY)
