@@ -9,6 +9,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import org.fenggui.binding.render.Graphics;
+import org.fenggui.binding.render.ImageFont;
 import org.fenggui.binding.render.lwjgl.LWJGLOpenGL;
 import org.fenggui.binding.render.lwjgl.LWJGLTexture;
 import org.fenggui.event.key.KeyAdapter;
@@ -43,17 +44,19 @@ import com.kowymaker.client.graphics.core.IChild;
 
 public class Demo implements IChild
 {
-    private final List<List<Tile>> tiles   = new LinkedList<List<Tile>>();
-    private final WorldGenerator   generator;
-    private final HeightMap        heightmap;
-    private final Temperature      temperature;
+    private final List<List<List<Tile>>> tiles   = new LinkedList<List<List<Tile>>>();
+    private final WorldGenerator         generator;
+    private final HeightMap              heightmap;
+    private final Temperature            temperature;
     
-    private int                    baseX   = 0;
-    private int                    baseY   = 0;
+    private int                          baseX   = 0;
+    private int                          baseY   = 0;
     
-    public static LWJGLTexture     texture = null;
+    public static LWJGLTexture           texture = null;
     
-    private final static int       TIMEOUT = 350;
+    public static String                 status  = "";
+    
+    private final static int             TIMEOUT = 350;
     
     public Demo(final KowyMakerClient main)
     {
@@ -260,11 +263,11 @@ public class Demo implements IChild
     {
         tiles.clear();
         
-        for (int y = 62; y >= 0; y--)
+        for (int y = 42; y >= 0; y--)
         {
             int startX = (y % 2 == 0) ? 0 : 1;
-            List<Tile> range = new LinkedList<Tile>();
-            for (int x = startX; x < 61; x += 2)
+            List<List<Tile>> range = new LinkedList<List<Tile>>();
+            for (int x = startX; x < 41; x += 2)
             {
                 
                 int tileX = x * (Tile.width / 2);
@@ -297,12 +300,17 @@ public class Demo implements IChild
                 int numZ = (int) MathsHelper.supervise(Math.round(height) + 1,
                         1, 20);
                 
+                List<Tile> range2 = new LinkedList<Tile>();
+                
                 for (int z = 0; z < numZ; z++)
                 {
                     int tileZ = z * Tile.depth;
                     
-                    range.add(new Tile(tileX, tileY, tileZ, color));
+                    range2.add(new Tile(tileX, tileY, tileZ, color, biome
+                            .getClass().getSimpleName()));
                 }
+                
+                range.add(range2);
                 
                 for (Parameter param : generator.getEnvironment()
                         .getParameters().values())
@@ -316,12 +324,46 @@ public class Demo implements IChild
     
     public void update(ClientEngine engine)
     {
-        for (List<Tile> range : tiles)
+        boolean checked = false;
+        
+        int mouseX = Mouse.getX();
+        int mouseY = Mouse.getY();
+        
+        for (int i = tiles.size() - 1; i >= 0; i--)
         {
-            for (Tile tile : range)
+            List<List<Tile>> range = tiles.get(i);
+            
+            for (List<Tile> range2 : range)
             {
-                tile.update(engine);
+                for (int j = range2.size() - 1; j >= 0; j--)
+                {
+                    Tile tile = range2.get(j);
+                    
+                    if (tile.contains(mouseX, mouseY))
+                    {
+                        if (!checked)
+                        {
+                            tile.hover = true;
+                            checked = true;
+                        }
+                        else
+                        {
+                            tile.hover = false;
+                        }
+                    }
+                    else
+                    {
+                        tile.hover = false;
+                    }
+                    
+                    tile.update(engine);
+                }
             }
+        }
+        
+        if (!checked)
+        {
+            status = "";
         }
     }
     
@@ -334,7 +376,8 @@ public class Demo implements IChild
                 texture = LWJGLTexture.uploadTextureToVideoRAM(ImageIO
                         .read(new File("res/tiles/grass.png")));
                 
-                System.out.println("Texture loaded: " + texture.getImageWidth() + "*" + texture.getImageHeight() + "px");
+                System.out.println("Texture loaded: " + texture.getImageWidth()
+                        + "*" + texture.getImageHeight() + "px");
             }
             catch (IOException e)
             {
@@ -342,29 +385,29 @@ public class Demo implements IChild
             }
         }
         
-        for (List<Tile> range : tiles)
+        for (List<List<Tile>> range : tiles)
         {
-            for (Tile tile : range)
+            for (List<Tile> range2 : range)
             {
-                tile.render(engine);
+                for (Tile tile : range2)
+                {
+                    tile.render(engine);
+                }
             }
         }
+        
+        ImageFont font = ImageFont.getDefaultFont();
+        Graphics g = engine.getBinding().getGraphics();
+        
+        engine.getGl().color(Color.WHITE);
+        g.setFont(font);
+        g.drawString(status, 0,
+                engine.getConfig().getHeight() - font.getHeight());
     }
     
     public boolean contains(double x, double y)
     {
         boolean contains = false;
-        
-        for (List<Tile> range : tiles)
-        {
-            for (Tile tile : range)
-            {
-                if (!contains)
-                {
-                    contains = tile.contains(x, y);
-                }
-            }
-        }
         
         return contains;
     }
@@ -377,54 +420,42 @@ public class Demo implements IChild
         
         private final int       x;
         private final int       y;
-        private final Color     baseColor;
-        private Color           color;
+        private final Color     color;
+        private final String    biomeName;
         
         private boolean         hover  = false;
         
-        public Tile(int x, int y, int z)
-        {
-            this(x, y, z, Color.random());
-        }
-        
-        public Tile(int x, int y, int z, Color color)
+        public Tile(int x, int y, int z, Color color, String biomeName)
         {
             this.x = x;
             this.y = y + z;
             
-            this.baseColor = color;
             this.color = color;
+            this.biomeName = biomeName;
         }
         
         public void update(ClientEngine engine)
         {
-            int mouseX = Mouse.getX();
-            int mouseY = Mouse.getY();
-            
-            if (contains(mouseX, mouseY))
+            if (hover)
             {
-                if (!hover)
-                {
-                    color = color.darker();
-                    hover = true;
-                }
-            }
-            else
-            {
-                if (hover)
-                {
-                    color = baseColor.clone();
-                    hover = false;
-                }
+                status = "Tile@[" + x + ";" + y + "] - Biome : '" + biomeName
+                        + "'";
             }
         }
         
         public void render(ClientEngine engine)
         {
             LWJGLOpenGL gl = engine.getGl();
-
+            
             Graphics g = engine.getBinding().getGraphics();
-            gl.color(color);
+            if (hover)
+            {
+                gl.color(color.darker());
+            }
+            else
+            {
+                gl.color(color);
+            }
             g.drawImage(texture, x, y - 10);
             
             // gl.startQuads();
@@ -501,6 +532,11 @@ public class Demo implements IChild
             }
             
             return false;
+        }
+        
+        public boolean isHover()
+        {
+            return hover;
         }
     }
 }
