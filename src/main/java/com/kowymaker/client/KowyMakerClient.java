@@ -40,7 +40,7 @@ public class KowyMakerClient
         window = new ClientWindow(this);
         
         // Let Demo
-        window.getApplet().getEngine().addChild(new Demo());
+        window.getApplet().getEngine().addChild(new Demo(this));
     }
     
     public void start()
@@ -60,6 +60,11 @@ public class KowyMakerClient
     public Configuration getConfig()
     {
         return config;
+    }
+    
+    public ClientWindow getWindow()
+    {
+        return window;
     }
     
     public static void main(String[] args)

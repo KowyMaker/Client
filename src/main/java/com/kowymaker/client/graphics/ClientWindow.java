@@ -5,6 +5,8 @@ import java.awt.Frame;
 import java.awt.HeadlessException;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -48,6 +50,14 @@ public class ClientWindow extends Frame
             public void windowClosing(WindowEvent e)
             {
                 main.stop();
+            }
+        });
+        
+        addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e)
+            {
+                applet.requestFocusInWindow();
             }
         });
         
