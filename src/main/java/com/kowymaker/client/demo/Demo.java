@@ -32,6 +32,7 @@ import com.kokakiwi.maths.generator.sample.params.Snow;
 import com.kokakiwi.maths.generator.sample.params.Temperature;
 import com.kokakiwi.maths.generator.sample.params.Volcano;
 import com.kokakiwi.maths.generator.world.WorldGenerator;
+import com.kokakiwi.maths.generator.world.env.Parameter;
 import com.kokakiwi.maths.generator.world.gen.Biome;
 import com.kokakiwi.maths.generator.world.utils.MathsHelper;
 import com.kowymaker.client.KowyMakerClient;
@@ -43,11 +44,12 @@ public class Demo implements IChild
     private final List<List<Tile>> tiles   = new LinkedList<List<Tile>>();
     private final WorldGenerator   generator;
     private final HeightMap        heightmap;
+    private final Temperature      temperature;
     
     private int                    baseX   = 0;
     private int                    baseY   = 0;
     
-    private final static int       TIMEOUT = 500;
+    private final static int       TIMEOUT = 350;
     
     public Demo(final KowyMakerClient main)
     {
@@ -72,6 +74,8 @@ public class Demo implements IChild
         generator.getEnvironment().registerParameter(Snow.class);
         
         heightmap = generator.getEnvironment().getParameter(HeightMap.class);
+        temperature = generator.getEnvironment()
+                .getParameter(Temperature.class);
         
         create();
         
@@ -252,25 +256,27 @@ public class Demo implements IChild
     {
         tiles.clear();
         
-        for (int y = 57; y >= 0; y--)
+        for (int y = 62; y >= 0; y--)
         {
             int startX = (y % 2 == 0) ? 0 : 1;
             List<Tile> range = new LinkedList<Tile>();
-            for (int x = startX; x < 47; x += 2)
+            for (int x = startX; x < 61; x += 2)
             {
-                
-                heightmap.reset();
                 
                 int tileX = x * (Tile.width / 2);
                 int tileY = y * (Tile.height / 2);
                 
-                double worldX = (tileX + baseX) * 0.5;
-                double worldY = (tileY + baseY) * 0.5;
+                double worldX = (tileX + baseX) * 0.07;
+                double worldY = (tileY + baseY) * 0.07;
                 
                 Biome biome = generator.getBiome(worldX, worldY);
                 java.awt.Color biomeColor = biome.getColor(worldX, worldY);
                 Color color = new Color(biomeColor.getRed(),
                         biomeColor.getGreen(), biomeColor.getBlue());
+                
+//                double temp = temperature.getValue(worldX, worldY) * 0.01;
+//                color = color.darker(MathsHelper.supervise(1 - Float.parseFloat(Double.toString(temp)), 0, 0.6f));
+                
                 double height = heightmap.getValue(worldX, worldY) * 10;
                 
                 int numZ = (int) MathsHelper.supervise(Math.round(height) + 1,
@@ -283,6 +289,11 @@ public class Demo implements IChild
                     range.add(new Tile(tileX, tileY, tileZ, color));
                 }
                 
+                for (Parameter param : generator.getEnvironment()
+                        .getParameters().values())
+                {
+                    param.reset();
+                }
             }
             tiles.add(range);
         }
@@ -418,9 +429,40 @@ public class Demo implements IChild
             double localX = x - this.x;
             double localY = y - this.y;
             
-            if (localX > 0 && localX <= width && localY > 0 && localY <= height)
+            if (localX >= 0 && localX <= width && localY >= -10
+                    && localY <= height)
             {
-                return true;
+                double limitUpY;
+                
+                if (localX < width / 2)
+                {
+                    limitUpY = (height / 2) + ((height * localX) / width);
+                }
+                else
+                {
+                    limitUpY = (height / 2)
+                            + ((height / 2) + (-height * (localX - (width / 2)) / width));
+                }
+                
+                if (localY < limitUpY)
+                {
+                    double limitDownY;
+                    
+                    if (localX < width / 2)
+                    {
+                        limitDownY = (-height * localX / width) + (height / 2)
+                                - depth;
+                    }
+                    else
+                    {
+                        limitDownY = (height * (localX - (width / 2)) / width) - depth;
+                    }
+                    
+                    if (localY > limitDownY)
+                    {
+                        return true;
+                    }
+                }
             }
             
             return false;

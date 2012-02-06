@@ -24,8 +24,8 @@
 	</dependencies>
 	<repositories>
 		<repository>
-			<id>kokabsolu-repo</id>
-			<url>http://maven.kokabsolu.com/maven2/</url>
+			<id>kiwi-jenkins-repo</id>
+			<url>http://ci.kokaelkiwi.eu:8080/plugin/repository/everything/</url>
 		</repository>
 	</repositories>
 	<build>
