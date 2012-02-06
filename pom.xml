@@ -19,7 +19,7 @@
 		<dependency>
 			<groupId>com.kokakiwi.maths.generator</groupId>
 			<artifactId>world-generator</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.1.0</version>
 		</dependency>
 	</dependencies>
 	<repositories>
