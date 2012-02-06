@@ -8,7 +8,9 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import org.fenggui.binding.render.Graphics;
 import org.fenggui.binding.render.lwjgl.LWJGLOpenGL;
+import org.fenggui.binding.render.lwjgl.LWJGLTexture;
 import org.fenggui.event.key.KeyAdapter;
 import org.fenggui.event.key.KeyPressedEvent;
 import org.fenggui.event.key.KeyReleasedEvent;
@@ -48,6 +50,8 @@ public class Demo implements IChild
     
     private int                    baseX   = 0;
     private int                    baseY   = 0;
+    
+    public static LWJGLTexture     texture = null;
     
     private final static int       TIMEOUT = 350;
     
@@ -274,15 +278,18 @@ public class Demo implements IChild
                 Color color = new Color(biomeColor.getRed(),
                         biomeColor.getGreen(), biomeColor.getBlue());
                 
-                if(biome instanceof SnowBiome)
+                if (biome instanceof SnowBiome)
                 {
                     double temp = temperature.getValue(worldX, worldY) * 0.01;
-                    color = color.brighter(MathsHelper.supervise(Float.parseFloat(Double.toString(temp)), 0, 0.2f));
+                    color = color.brighter(MathsHelper.supervise(
+                            Float.parseFloat(Double.toString(temp)), 0, 0.2f));
                 }
                 else
                 {
                     double temp = temperature.getValue(worldX, worldY) * 0.01;
-                    color = color.darker(MathsHelper.supervise(1 - Float.parseFloat(Double.toString(temp)), 0, 0.8f));
+                    color = color.darker(MathsHelper.supervise(
+                            1 - Float.parseFloat(Double.toString(temp)), 0,
+                            0.8f));
                 }
                 
                 double height = heightmap.getValue(worldX, worldY) * 10;
@@ -320,6 +327,21 @@ public class Demo implements IChild
     
     public void render(ClientEngine engine)
     {
+        if (texture == null)
+        {
+            try
+            {
+                texture = LWJGLTexture.uploadTextureToVideoRAM(ImageIO
+                        .read(new File("res/tiles/grass.png")));
+                
+                System.out.println("Texture loaded: " + texture.getImageWidth() + "*" + texture.getImageHeight() + "px");
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        
         for (List<Tile> range : tiles)
         {
             for (Tile tile : range)
@@ -400,36 +422,40 @@ public class Demo implements IChild
         public void render(ClientEngine engine)
         {
             LWJGLOpenGL gl = engine.getGl();
-            
-            gl.startQuads();
-            
+
+            Graphics g = engine.getBinding().getGraphics();
             gl.color(color);
-            gl.vertex(x + (width / 2), y + height);
-            gl.vertex(x + width, y + (height / 2));
-            gl.vertex(x + (width / 2), y);
-            gl.vertex(x, y + (height / 2));
+            g.drawImage(texture, x, y - 10);
             
-            gl.end();
-            
-            gl.startQuads();
-            
-            gl.color(color.darker(0.15f));
-            gl.vertex(x, y + (height / 2));
-            gl.vertex(x + (width / 2), y);
-            gl.vertex(x + (width / 2), y - depth);
-            gl.vertex(x, y + (height / 2) - depth);
-            
-            gl.end();
-            
-            gl.startQuads();
-            
-            gl.color(color.darker(0.15f));
-            gl.vertex(x + (width / 2), y);
-            gl.vertex(x + width, y + (height / 2));
-            gl.vertex(x + width, y + (height / 2) - depth);
-            gl.vertex(x + (width / 2), y - depth);
-            
-            gl.end();
+            // gl.startQuads();
+            //
+            // gl.color(color);
+            // gl.vertex(x + (width / 2), y + height);
+            // gl.vertex(x + width, y + (height / 2));
+            // gl.vertex(x + (width / 2), y);
+            // gl.vertex(x, y + (height / 2));
+            //
+            // gl.end();
+            //
+            // gl.startQuads();
+            //
+            // gl.color(color.darker(0.15f));
+            // gl.vertex(x, y + (height / 2));
+            // gl.vertex(x + (width / 2), y);
+            // gl.vertex(x + (width / 2), y - depth);
+            // gl.vertex(x, y + (height / 2) - depth);
+            //
+            // gl.end();
+            //
+            // gl.startQuads();
+            //
+            // gl.color(color.darker(0.15f));
+            // gl.vertex(x + (width / 2), y);
+            // gl.vertex(x + width, y + (height / 2));
+            // gl.vertex(x + width, y + (height / 2) - depth);
+            // gl.vertex(x + (width / 2), y - depth);
+            //
+            // gl.end();
         }
         
         public boolean contains(double x, double y)
