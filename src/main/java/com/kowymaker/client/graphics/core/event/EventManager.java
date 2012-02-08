@@ -268,12 +268,12 @@ public class EventManager
                             if (!display.fireKeyTypedEvent(c))
                             {
                                 listener.keyTyped(new KeyTypedEvent(null, c,
-                                        modifiers));
+                                        key, modifiers));
                             }
                         }
                         else
                         {
-                            listener.keyTyped(new KeyTypedEvent(null, c,
+                            listener.keyTyped(new KeyTypedEvent(null, c, key,
                                     modifiers));
                         }
                     }

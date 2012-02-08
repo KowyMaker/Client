@@ -158,7 +158,7 @@ public class ClientEngine implements Runnable
         Graphics g = binding.getGraphics();
         
         g.setFont(ImageFont.getDefaultFont());
-        gl.color(Color.WHITE);
+        gl.color(Color.RED);
         g.drawString("FPS: " + fps.getFps(), 0, 0);
     }
     

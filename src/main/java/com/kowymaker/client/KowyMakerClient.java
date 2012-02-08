@@ -2,7 +2,10 @@ package com.kowymaker.client;
 
 import java.io.File;
 
-import com.kowymaker.client.demo.Demo;
+import org.lwjgl.input.Keyboard;
+
+import com.kowymaker.client.core.world.World;
+import com.kowymaker.client.demo.WorldDemo;
 import com.kowymaker.client.graphics.ClientWindow;
 import com.kowymaker.spec.console.ConsoleOutputManager;
 import com.kowymaker.spec.utils.Configuration;
@@ -39,8 +42,18 @@ public class KowyMakerClient
         // Load Window
         window = new ClientWindow(this);
         
-        // Let Demo
-        window.getApplet().getEngine().addChild(new Demo(this));
+        World world = new World(this);
+        WorldDemo demo = new WorldDemo(this, world);
+        window.getApplet().getEventManager()
+                .registerKeyListener(Keyboard.KEY_UP, demo);
+        window.getApplet().getEventManager()
+                .registerKeyListener(Keyboard.KEY_LEFT, demo);
+        window.getApplet().getEventManager()
+                .registerKeyListener(Keyboard.KEY_DOWN, demo);
+        window.getApplet().getEventManager()
+                .registerKeyListener(Keyboard.KEY_RIGHT, demo);
+        
+        window.getApplet().getEngine().addChild(world);
     }
     
     public void start()
