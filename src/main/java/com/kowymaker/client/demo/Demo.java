@@ -16,8 +16,10 @@ import org.fenggui.event.key.KeyAdapter;
 import org.fenggui.event.key.KeyPressedEvent;
 import org.fenggui.event.key.KeyReleasedEvent;
 import org.fenggui.util.Color;
+import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 
 import com.kokakiwi.maths.generator.sample.biomes.DesertBiome;
 import com.kokakiwi.maths.generator.sample.biomes.ForestBiome;
@@ -374,7 +376,7 @@ public class Demo implements IChild
             try
             {
                 texture = LWJGLTexture.uploadTextureToVideoRAM(ImageIO
-                        .read(new File("res/tiles/grass.png")));
+                        .read(new File("res/tiles/grass2.png")));
                 
                 System.out.println("Texture loaded: " + texture.getImageWidth()
                         + "*" + texture.getImageHeight() + "px");
@@ -428,7 +430,7 @@ public class Demo implements IChild
         public Tile(int x, int y, int z, Color color, String biomeName)
         {
             this.x = x;
-            this.y = y + z;
+            this.y = y + z + 10;
             
             this.color = color;
             this.biomeName = biomeName;
@@ -450,7 +452,7 @@ public class Demo implements IChild
             Graphics g = engine.getBinding().getGraphics();
             if (hover)
             {
-                gl.color(color.darker());
+                gl.color(color.brighter());
             }
             else
             {

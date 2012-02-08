@@ -1,7 +1,6 @@
 package com.kowymaker.client.graphics.core;
 
 import java.awt.Canvas;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,9 +9,9 @@ import org.fenggui.binding.render.ImageFont;
 import org.fenggui.binding.render.lwjgl.LWJGLBinding;
 import org.fenggui.binding.render.lwjgl.LWJGLOpenGL;
 import org.fenggui.util.Color;
-import org.fenggui.util.fonttoolkit.FontFactory;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -75,6 +74,7 @@ public class ClientEngine implements Runnable
                 Display.create();
                 
                 Mouse.create();
+                Keyboard.create();
                 
                 useDisplay = true;
             }
@@ -138,16 +138,20 @@ public class ClientEngine implements Runnable
         eventManager.update();
         fps.update();
         
-        for (IChild child : childs)
+        for (int index = childs.size() - 1; index >= 0; index--)
         {
+            IChild child = childs.get(index);
+            
             child.update(this);
         }
     }
     
     private void render()
     {
-        for (IChild child : childs)
+        for (int index = childs.size() - 1; index >= 0; index--)
         {
+            IChild child = childs.get(index);
+            
             child.render(this);
         }
         
@@ -161,6 +165,11 @@ public class ClientEngine implements Runnable
     public void addChild(IChild child)
     {
         childs.add(child);
+    }
+    
+    public void addChild(IChild child, int index)
+    {
+        childs.add(index, child);
     }
     
     public List<IChild> getChilds()

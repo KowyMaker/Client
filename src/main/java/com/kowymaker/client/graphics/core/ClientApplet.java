@@ -17,15 +17,20 @@ import org.lwjgl.opengl.AWTGLCanvas;
 import org.lwjgl.opengl.GL11;
 
 import com.kowymaker.client.graphics.core.event.EventManager;
+import com.kowymaker.client.graphics.core.ui.UserInterface;
 
 public class ClientApplet extends Applet
 {
-    private static final long  serialVersionUID = 2556163398694720499L;
+    private static final long   serialVersionUID = 2556163398694720499L;
     
-    private final AWTGLCanvas  canvas;
-    private final ClientEngine engine;
-    private final Thread       thread;
-    private final EventManager eventManager;
+    private final AWTGLCanvas   canvas;
+    
+    private final ClientEngine  engine;
+    private final Thread        thread;
+    
+    private final UserInterface ui;
+    
+    private final EventManager  eventManager;
     
     public ClientApplet(int width, int height) throws HeadlessException,
             LWJGLException
@@ -41,6 +46,9 @@ public class ClientApplet extends Applet
         
         thread = new Thread(engine);
         
+        ui = new UserInterface(this);
+        engine.addChild(ui, 0);
+        
         setBackground(Color.black);
         setLayout(new BorderLayout());
         
@@ -51,6 +59,7 @@ public class ClientApplet extends Applet
             public void componentResized(ComponentEvent e)
             {
                 engine.resize(canvas.getWidth(), canvas.getHeight());
+                ui.resize(canvas.getWidth(), canvas.getHeight());
             }
         });
         
@@ -61,12 +70,6 @@ public class ClientApplet extends Applet
                 canvas.requestFocusInWindow();
             }
         });
-    }
-    
-    @Override
-    public void init()
-    {
-        
     }
     
     @Override
@@ -121,6 +124,11 @@ public class ClientApplet extends Applet
     public Thread getThread()
     {
         return thread;
+    }
+    
+    public UserInterface getUi()
+    {
+        return ui;
     }
     
     public EventManager getEventManager()
