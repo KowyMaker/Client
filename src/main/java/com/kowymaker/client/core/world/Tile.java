@@ -68,20 +68,27 @@ public class Tile implements IChild
     
     public void render(ClientEngine engine)
     {
-        int calcX = getWorldX() - chunk.getWorld().getOffsetX();
-        int calcY = getWorldY() - chunk.getWorld().getOffsetY();
+        int calcX = getWorldX() - chunk.getWorld().getOffsetX()
+                - (Chunk.width / 2);
+        int calcY = getWorldY() - chunk.getWorld().getOffsetY()
+                - (Chunk.height / 2);
         
-        if (getWorldX() == chunk.getWorld().getOffsetX()
-                && getWorldY() == chunk.getWorld().getOffsetY())
+        int renderX = ((calcX - calcY) * width / 2)
+                + (chunk.getWorld().getMain().getWindow().getApplet()
+                        .getCanvas().getWidth() / 2);
+        int renderY = ((calcX + calcY) * height / 2)
+                + (depth * z)
+                + (chunk.getWorld().getMain().getWindow().getApplet()
+                        .getCanvas().getHeight() / 2);
+        
+        Graphics g = engine.getBinding().getGraphics();
+        engine.getGl().color(color);
+        
+        if(getWorldX() == chunk.getWorld().getOffsetX() && getWorldY() == chunk.getWorld().getOffsetY())
         {
             engine.getGl().color(Color.WHITE);
         }
         
-        int renderX = ((calcX - calcY) * width / 2) + (chunk.getWorld().getMain().getWindow().getApplet().getCanvas().getWidth() / 2);
-        int renderY = ((calcX + calcY) * height / 2) + (depth * z) + (chunk.getWorld().getMain().getWindow().getApplet().getCanvas().getHeight() / 2);
-        
-        Graphics g = engine.getBinding().getGraphics();
-        engine.getGl().color(color);
         g.drawImage(chunk.getWorld().getTexture(), renderX, renderY - 10);
     }
     

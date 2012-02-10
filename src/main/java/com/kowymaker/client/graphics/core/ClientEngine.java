@@ -18,6 +18,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 
 import com.kowymaker.client.graphics.core.event.EventManager;
+import com.kowymaker.spec.utils.debug.Debug;
 
 public class ClientEngine implements Runnable
 {

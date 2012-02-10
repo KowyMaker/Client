@@ -28,6 +28,7 @@ import com.kokakiwi.maths.generator.world.WorldGenerator;
 import com.kowymaker.client.KowyMakerClient;
 import com.kowymaker.client.graphics.core.ClientEngine;
 import com.kowymaker.client.graphics.core.IChild;
+import com.kowymaker.spec.utils.debug.Debug;
 
 public class World implements IChild
 {
@@ -135,6 +136,8 @@ public class World implements IChild
         return generator.getEnvironment().getParameter(HeightMap.class);
     }
     
+    int n = 1;
+    
     public void update(ClientEngine engine)
     {
         if (texture == null)
@@ -155,10 +158,10 @@ public class World implements IChild
         
         Chunk center = getChunkByWorldCoord(offsetX, offsetY);
         
-        int startX = center.getX() - 1;
-        int endX = center.getX() + 1;
-        int startY = center.getY() - 1;
-        int endY = center.getY() + 1;
+        int startX = center.getX() - n;
+        int endX = center.getX() + n;
+        int startY = center.getY() - n;
+        int endY = center.getY() + n;
         
         for (int x = startX; x <= endX; x++)
         {
@@ -169,15 +172,18 @@ public class World implements IChild
         }
     }
     
+    boolean a = false;
+    
     public void render(ClientEngine engine)
     {
         Chunk center = getChunkByWorldCoord(offsetX, offsetY);
         
-        int startX = center.getX() - 1;
-        int endX = center.getX() + 1;
-        int startY = center.getY() - 1;
-        int endY = center.getY() + 1;
+        int startX = center.getX() - n;
+        int endX = center.getX() + n;
+        int startY = center.getY() - n;
+        int endY = center.getY() + n;
         
+        int num = 0;
         for (int x = endX; x >= startX; x--)
         {
             for (int y = endY; y >= startY; y--)
@@ -185,7 +191,14 @@ public class World implements IChild
                 Chunk chunk = getChunk(x, y);
                 
                 chunk.render(engine);
+                num++;
             }
+        }
+        if(!a)
+        {
+            System.out.println("Rendered " + num + " chunks.");
+            System.out.println("Rendered " + (num * Chunk.width * Chunk.height) + " tiles.");
+            a = true;
         }
     }
     

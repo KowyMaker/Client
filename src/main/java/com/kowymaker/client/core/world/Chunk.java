@@ -9,6 +9,7 @@ import com.kokakiwi.maths.generator.world.gen.Biome;
 import com.kokakiwi.maths.generator.world.utils.MathsHelper;
 import com.kowymaker.client.graphics.core.ClientEngine;
 import com.kowymaker.client.graphics.core.IChild;
+import com.kowymaker.spec.utils.debug.Debug;
 
 public class Chunk implements IChild
 {
