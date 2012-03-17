@@ -3,6 +3,7 @@ package com.kowymaker.client.graphics.core.ui;
 import org.fenggui.Display;
 import org.fenggui.FengGUI;
 import org.fenggui.theme.DefaultTheme;
+
 import com.kowymaker.client.graphics.core.ClientApplet;
 import com.kowymaker.client.graphics.core.ClientEngine;
 import com.kowymaker.client.graphics.core.IChild;
@@ -51,7 +52,7 @@ public class UserInterface implements IChild
         display = new Display(engine.getBinding());
         FengGUI.setTheme(new DefaultTheme());
         
-        applet.getEventManager().setDisplay(display);
+        engine.getEventManager().setDisplay(display);
     }
     
     public void resize(int width, int height)

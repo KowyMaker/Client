@@ -3,12 +3,15 @@ package com.kowymaker.client.graphics.core;
 import java.awt.Canvas;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.fenggui.binding.render.Graphics;
+import org.fenggui.binding.render.IOpenGL;
 import org.fenggui.binding.render.ImageFont;
 import org.fenggui.binding.render.lwjgl.LWJGLBinding;
 import org.fenggui.binding.render.lwjgl.LWJGLOpenGL;
 import org.fenggui.util.Color;
+import org.fenggui.util.Dimension;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
@@ -17,25 +20,28 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 
+import com.google.common.util.concurrent.Atomics;
 import com.kowymaker.client.graphics.core.event.EventManager;
 import com.kowymaker.spec.utils.debug.Debug;
 
 public class ClientEngine implements Runnable
 {
-    private final Configuration config;
-    private final EventManager  eventManager;
+    private final Configuration        config;
+    private final EventManager         eventManager;
     
-    private final FPS           fps        = new FPS();
+    private final FPS                  fps          = new FPS();
     
-    private Object              context    = null;
-    private boolean             running    = false;
-    private boolean             useDisplay = false;
-    private boolean             updateSize = false;
+    private Object                     context      = null;
+    private boolean                    running      = false;
+    private boolean                    useDisplay   = false;
+    private AtomicReference<Dimension> newDimension = Atomics.newReference();
     
-    private LWJGLBinding        binding    = null;
-    private LWJGLOpenGL         gl         = null;
+    private LWJGLBinding               binding      = null;
+    private LWJGLOpenGL                gl           = null;
     
-    private final List<IChild>  childs     = new ArrayList<IChild>();
+    public static String               text         = "";
+    
+    private final List<IChild>         childs       = new ArrayList<IChild>();
     
     public ClientEngine(Configuration config, EventManager eventManager)
     {
@@ -56,6 +62,8 @@ public class ClientEngine implements Runnable
             {
                 loop();
             }
+            
+            Display.destroy();
         }
         catch (LWJGLException e)
         {
@@ -63,15 +71,15 @@ public class ClientEngine implements Runnable
         }
     }
     
-    private void initGL() throws LWJGLException
+    public void initGL() throws LWJGLException
     {
         if (context != null)
         {
             if (context instanceof Canvas)
             {
                 Display.setParent((Canvas) context);
-                
                 Display.setVSyncEnabled(true);
+                
                 Display.create();
                 
                 Mouse.create();
@@ -85,7 +93,10 @@ public class ClientEngine implements Runnable
             }
         }
         
-        binding = new LWJGLBinding();
+        if (binding == null)
+        {
+            binding = new LWJGLBinding();
+        }
         gl = (LWJGLOpenGL) binding.getOpenGL();
         
         // PROJECTION
@@ -103,31 +114,45 @@ public class ClientEngine implements Runnable
         
         gl.enableTexture2D(true);
         gl.setTexEnvModeModulate();
-        GL11.glEnable(GL11.GL_BLEND);
+        gl.enable(IOpenGL.Attribute.BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     }
     
-    private void loop()
+    Debug.Locker locker = Debug.createLocker("Loop", new Debug.CounterLocker(3));
+    
+    public void loop()
     {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         
+        Debug.update("Loop");
         update();
+        long update = Debug.diffAndUpdate("Loop");
         render();
+        long render = Debug.diff("Loop");
+        
+        if (locker.lock())
+        {
+            System.out.println("[Loop] Update : " + update + " ms.");
+            System.out.println("       Render : " + render + " ms.");
+            System.out.println("       Total  : " + (update + render) + " ms.");
+        }
         
         if (useDisplay)
         {
             Display.update();
         }
         
-        if (updateSize)
+        Dimension dim;
+        if ((dim = newDimension.getAndSet(null)) != null)
         {
+            config.setWidth(dim.getWidth());
+            config.setHeight(dim.getHeight());
+            
             gl.setProjectionMatrixMode();
             gl.loadIdentity();
             
             gl.setOrtho(0, config.width, 0, config.height, -1, 1);
             gl.setViewPort(0, 0, config.width, config.height);
-            
-            updateSize = false;
         }
         
         gl.setModelMatrixMode();
@@ -159,8 +184,13 @@ public class ClientEngine implements Runnable
         Graphics g = binding.getGraphics();
         
         g.setFont(ImageFont.getDefaultFont());
-        gl.color(Color.RED);
+        g.setColor(Color.RED);
         g.drawString("FPS: " + fps.getFps(), 0, 0);
+        
+        g.drawString(text, 0, config.getHeight()
+                - ImageFont.getDefaultFont().getHeight());
+        
+        g.setColor(config.getBackground());
     }
     
     public void addChild(IChild child)
@@ -208,6 +238,11 @@ public class ClientEngine implements Runnable
         return binding;
     }
     
+    public void setBinding(LWJGLBinding binding)
+    {
+        this.binding = binding;
+    }
+    
     public LWJGLOpenGL getGl()
     {
         return gl;
@@ -225,10 +260,7 @@ public class ClientEngine implements Runnable
     
     public void resize(int width, int height)
     {
-        config.width = width;
-        config.height = height;
-        
-        updateSize = true;
+        newDimension.set(new Dimension(width, height));
     }
     
     public static class Configuration

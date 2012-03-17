@@ -38,7 +38,7 @@ public class ClientApplet extends Applet
         super();
         canvas = new AWTGLCanvas();
         canvas.setSize(width, height);
-        eventManager = new EventManager(this);
+        eventManager = new EventManager();
         
         engine = new ClientEngine(
                 new ClientEngine.Configuration(width, height), eventManager);

@@ -1,5 +1,6 @@
 package com.kowymaker.client.core.world;
 
+import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -32,8 +33,6 @@ import com.kowymaker.spec.utils.debug.Debug;
 
 public class World implements IChild
 {
-    private final KowyMakerClient             main;
-    
     private int                               offsetX = 0;
     private int                               offsetY = 0;
     
@@ -43,7 +42,9 @@ public class World implements IChild
     
     private final WorldGenerator              generator;
     
-    public World(KowyMakerClient main)
+    public static int                         tile    = 0;
+    
+    public World()
     {
         generator = new WorldGenerator("kq452f25fqfs*/q-s*/-sq*fs/q*+/qf");
         // On inscrit les biomes
@@ -64,14 +65,53 @@ public class World implements IChild
         generator.getEnvironment().registerParameter(Oasis.class);
         generator.getEnvironment().registerParameter(Volcano.class);
         generator.getEnvironment().registerParameter(Snow.class);
+    }
+    
+    public Tile getTileByWorldCoord(int x, int y)
+    {
+        int localX = x % Chunk.width;
+        int localY = y % Chunk.height;
         
-        this.main = main;
+        if(localX < 0)
+        {
+            localX += Chunk.width;
+        }
+        
+        if(localY < 0)
+        {
+            localY += Chunk.height;
+        }
+        
+        return getChunkByWorldCoord(x, y).getTile(localX, localY);
     }
     
     public Chunk getChunkByWorldCoord(int x, int y)
     {
-        int chunkX = (x - (x % Chunk.width)) / Chunk.width;
-        int chunkY = (y - (y % Chunk.height)) / Chunk.height;
+        int cx = x;
+        int cy = y;
+        
+        if (x < 0)
+        {
+            cx++;
+        }
+        
+        if (y < 0)
+        {
+            cy++;
+        }
+        
+        int chunkX = (cx - (cx % Chunk.width)) / Chunk.width;
+        int chunkY = (cy - (cy % Chunk.height)) / Chunk.height;
+        
+        if (x < 0)
+        {
+            chunkX--;
+        }
+        
+        if (y < 0)
+        {
+            chunkY--;
+        }
         
         return getChunk(chunkX, chunkY);
     }
@@ -116,11 +156,6 @@ public class World implements IChild
         this.offsetY = offsetY;
     }
     
-    public KowyMakerClient getMain()
-    {
-        return main;
-    }
-    
     public LWJGLTexture getTexture()
     {
         return texture;
@@ -136,7 +171,7 @@ public class World implements IChild
         return generator.getEnvironment().getParameter(HeightMap.class);
     }
     
-    int n = 1;
+    int n = 3;
     
     public void update(ClientEngine engine)
     {
@@ -154,7 +189,11 @@ public class World implements IChild
             {
                 e.printStackTrace();
             }
+            
+            Debug.setData("tile.font", new Font("Default", 1, 16));
         }
+        
+        tile = 0;
         
         Chunk center = getChunkByWorldCoord(offsetX, offsetY);
         
@@ -167,12 +206,12 @@ public class World implements IChild
         {
             for (int y = startY; y <= endY; y++)
             {
-                getChunk(x, y).render(engine);
+                getChunk(x, y).update(engine);
             }
         }
+        
+        ClientEngine.text = "Tiles : " + tile;
     }
-    
-    boolean a = false;
     
     public void render(ClientEngine engine)
     {
@@ -183,7 +222,6 @@ public class World implements IChild
         int startY = center.getY() - n;
         int endY = center.getY() + n;
         
-        int num = 0;
         for (int x = endX; x >= startX; x--)
         {
             for (int y = endY; y >= startY; y--)
@@ -191,15 +229,9 @@ public class World implements IChild
                 Chunk chunk = getChunk(x, y);
                 
                 chunk.render(engine);
-                num++;
             }
         }
-        if(!a)
-        {
-            System.out.println("Rendered " + num + " chunks.");
-            System.out.println("Rendered " + (num * Chunk.width * Chunk.height) + " tiles.");
-            a = true;
-        }
+        
     }
     
     public boolean contains(double x, double y)

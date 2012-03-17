@@ -29,25 +29,20 @@ import org.lwjgl.input.Mouse;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.kowymaker.client.graphics.core.ClientApplet;
 
 public class EventManager
 {
-    private final ClientApplet                             applet;
-    private Display                                        display        = null;
+    protected Display                                        display        = null;
     
-    private final Map<Integer, List<IKeyListener>>         keyListeners   = Maps.newLinkedHashMap();
-    private final Map<Integer, LWJGLEventBinder.State>     keyStates      = Maps.newLinkedHashMap();
-    private final Map<Integer, Character>                  keyCharValues  = Maps.newLinkedHashMap();
-    private final Set<Key>                                 modifiers      = Sets.newTreeSet();
+    protected final Map<Integer, List<IKeyListener>>         keyListeners   = Maps.newLinkedHashMap();
+    protected final Map<Integer, LWJGLEventBinder.State>     keyStates      = Maps.newLinkedHashMap();
+    protected final Map<Integer, Character>                  keyCharValues  = Maps.newLinkedHashMap();
+    protected final Set<Key>                                 modifiers      = Sets.newTreeSet();
     
-    private final Map<MouseButton, List<IMouseListener>>   mouseListeners = Maps.newEnumMap(MouseButton.class);
-    private final Map<MouseButton, LWJGLEventBinder.State> mouseStates    = Maps.newEnumMap(MouseButton.class);
+    protected final Map<MouseButton, List<IMouseListener>>   mouseListeners = Maps.newEnumMap(MouseButton.class);
+    protected final Map<MouseButton, LWJGLEventBinder.State> mouseStates    = Maps.newEnumMap(MouseButton.class);
     
-    public EventManager(ClientApplet applet)
-    {
-        this.applet = applet;
-    }
+    protected int                                            scrollAmount   = 0;
     
     public void registerKeyListener(int key, IKeyListener keyListener)
     {
@@ -95,6 +90,28 @@ public class EventManager
             
             final long current = System.currentTimeMillis();
             final long diff = current - state.getLastPressed();
+            
+            if (button == MouseButton.WHEEL)
+            {
+                int scroll = Mouse.getDWheel();
+                scrollAmount += scroll;
+                if (display != null)
+                {
+                    if (!display.fireMouseWheel(Mouse.getX(), Mouse.getY(),
+                            (scroll > 0), scroll, scrollAmount))
+                    {
+                        listener.mouseWheel(new MouseWheelEvent(null, Mouse
+                                .getX(), Mouse.getY(), (scroll > 0), scroll,
+                                scrollAmount, modifiers));
+                    }
+                }
+                else
+                {
+                    listener.mouseWheel(new MouseWheelEvent(null, Mouse.getX(),
+                            Mouse.getY(), (scroll > 0), scroll, scrollAmount,
+                            modifiers));
+                }
+            }
             
             if (Mouse.isButtonDown(button.getCode()))
             {
@@ -343,11 +360,6 @@ public class EventManager
         return keyCharValues.get(code);
     }
     
-    public ClientApplet getApplet()
-    {
-        return applet;
-    }
-    
     public Display getDisplay()
     {
         return display;
@@ -358,7 +370,7 @@ public class EventManager
         this.display = display;
     }
     
-    private class ListKeyListener implements IKeyListener
+    public class ListKeyListener implements IKeyListener
     {
         private final List<IKeyListener> keyListeners;
         
@@ -393,7 +405,7 @@ public class EventManager
         
     }
     
-    private class ListMouseListener implements IMouseListener
+    public class ListMouseListener implements IMouseListener
     {
         private final List<IMouseListener> mouseListeners;
         
