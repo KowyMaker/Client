@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.fenggui.binding.render.Graphics;
 import org.fenggui.binding.render.IOpenGL;
-import org.fenggui.binding.render.ImageFont;
 import org.fenggui.binding.render.lwjgl.LWJGLBinding;
 import org.fenggui.binding.render.lwjgl.LWJGLOpenGL;
 import org.fenggui.util.Color;
@@ -180,17 +178,6 @@ public class ClientEngine implements Runnable
             
             child.render(this);
         }
-        
-        Graphics g = binding.getGraphics();
-        
-        g.setFont(ImageFont.getDefaultFont());
-        g.setColor(Color.RED);
-        g.drawString("FPS: " + fps.getFps(), 0, 0);
-        
-        g.drawString(text, 0, config.getHeight()
-                - ImageFont.getDefaultFont().getHeight());
-        
-        g.setColor(config.getBackground());
     }
     
     public void addChild(IChild child)
