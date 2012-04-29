@@ -62,16 +62,9 @@ public class UserInterface implements IChild
         display = new Display(engine.getBinding());
         display.setLayoutManager(new BorderLayout());
         // FengGUI.setTheme(new DefaultTheme());
-        try
-        {
-            ITheme theme = null;
-            theme = new CSSTheme(new File("style.css"));
-            FengGUI.setTheme(theme);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+        ITheme theme = null;
+        theme = new CSSTheme(UserInterface.class.getResource("/style.css"));
+        FengGUI.setTheme(theme);
         
         Window window = new Window();
         window.setTitle("Window #1");

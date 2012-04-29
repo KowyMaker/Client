@@ -1,0 +1,46 @@
+window
+{
+    border: plain 3 rgb(0, 255, 0);
+}
+
+window > .content
+{
+    background: url("/background.png");
+}
+
+window > .title-bar > label
+{
+    background: rgb(255, 255, 255);
+    height: 30;
+    color: rgb(255, 0, 0);
+    font: "Arial" bold 20;
+}
+
+window > .title-bar > button
+{
+    padding: 3;
+    padding-left: 5;
+    padding-right: 5;
+    background: rgb(255, 0, 0);
+}
+
+window > .title-bar > button:hover
+{
+    background: rgb(0, 255, 0);
+}
+
+textfield
+{
+    padding: 3;
+    background: rgb(255, 255, 255);
+}
+
+menubar
+{
+    background: rgb(128, 255, 255);
+}
+
+menu
+{
+    background: rgb(0, 0, 128);
+}
