@@ -149,8 +149,8 @@ public class ClientEngine implements Runnable
             gl.setProjectionMatrixMode();
             gl.loadIdentity();
             
-            gl.setOrtho(0, config.width, 0, config.height, -1, 1);
-            gl.setViewPort(0, 0, config.width, config.height);
+            gl.setOrtho(0, config.getWidth(), 0, config.getHeight(), -1, 1);
+            gl.setViewPort(0, 0, config.getWidth(), config.getHeight());
         }
         
         gl.setModelMatrixMode();
@@ -258,7 +258,7 @@ public class ClientEngine implements Runnable
         
         public Configuration(int width, int height)
         {
-            this(width, height, Color.BLACK);
+            this(width, height, Color.WHITE);
         }
         
         public Configuration(int width, int height, Color background)

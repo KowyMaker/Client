@@ -1,5 +1,7 @@
 package com.kowymaker.client.core.world;
 
+import java.io.IOException;
+
 import org.fenggui.binding.render.Graphics;
 import org.fenggui.util.Color;
 
@@ -20,6 +22,7 @@ public class Tile implements IChild
     
     private final Color     color;
     private boolean         visible = true;
+    private boolean         hovered = false;
     
     public Tile(Chunk chunk, int x, int y, int z, java.awt.Color color)
     {
@@ -61,6 +64,16 @@ public class Tile implements IChild
         return z;
     }
     
+    public boolean isHovered()
+    {
+        return hovered;
+    }
+    
+    public void setHovered(boolean hovered)
+    {
+        this.hovered = hovered;
+    }
+    
     public void update(ClientEngine engine)
     {
         World.tile++;
@@ -97,8 +110,20 @@ public class Tile implements IChild
                     engine.getGl().color(Color.WHITE.darker().darker());
                 }
                 
-                g.drawImage(chunk.getWorld().getTexture(), renderX,
-                        renderY - 10);
+                if(hovered)
+                {
+                    engine.getGl().color(Color.WHITE);
+                }
+                
+                try
+                {
+                    g.drawImage(chunk.getWorld().getSequencer().getTexture(),
+                            renderX, renderY - 10);
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -124,6 +149,45 @@ public class Tile implements IChild
     
     public boolean contains(double x, double y)
     {
+        double localX = x - this.x;
+        double localY = y - this.y;
+        
+        if (localX >= 0 && localX <= width && localY >= -10 && localY <= height)
+        {
+            double limitUpY;
+            
+            if (localX < width / 2)
+            {
+                limitUpY = (height / 2) + ((height * localX) / width);
+            }
+            else
+            {
+                limitUpY = (height / 2)
+                        + ((height / 2) + (-height * (localX - (width / 2)) / width));
+            }
+            
+            if (localY < limitUpY)
+            {
+                double limitDownY;
+                
+                if (localX < width / 2)
+                {
+                    limitDownY = (-height * localX / width) + (height / 2)
+                            - depth;
+                }
+                else
+                {
+                    limitDownY = (height * (localX - (width / 2)) / width)
+                            - depth;
+                }
+                
+                if (localY > limitDownY)
+                {
+                    return true;
+                }
+            }
+        }
+        
         return false;
     }
     

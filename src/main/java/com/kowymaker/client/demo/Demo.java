@@ -1,5 +1,6 @@
 package com.kowymaker.client.demo;
 
+import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +44,10 @@ import com.kokakiwi.maths.generator.world.utils.MathsHelper;
 import com.kowymaker.client.KowyMakerClient;
 import com.kowymaker.client.graphics.core.ClientEngine;
 import com.kowymaker.client.graphics.core.IChild;
+import com.kowymaker.spec.res.ResourcesManager;
+import com.kowymaker.spec.res.impl.TileFile;
+import com.kowymaker.spec.res.impl.TileFormat;
+import com.kowymaker.spec.utils.debug.Debug;
 
 public class Demo implements IChild
 {
@@ -304,7 +309,7 @@ public class Demo implements IChild
                 
                 List<Tile> range2 = new LinkedList<Tile>();
                 
-                for (int z = 0; z < numZ; z++)
+                for (int z = numZ - 1; z < numZ; z++)
                 {
                     int tileZ = z * Tile.depth;
                     
@@ -375,13 +380,19 @@ public class Demo implements IChild
         {
             try
             {
-                texture = LWJGLTexture.uploadTextureToVideoRAM(ImageIO
-                        .read(new File("res/tiles/grass2.png")));
+                TileFile tile = ResourcesManager.get(TileFormat.class).load(
+                        new File("res/tiles/grass.kmr"));
+                
+                texture = LWJGLTexture.uploadTextureToVideoRAM(tile
+                        .getSequencer().getSequence("normal").getFrame(0)
+                        .getData());
                 
                 System.out.println("Texture loaded: " + texture.getImageWidth()
                         + "*" + texture.getImageHeight() + "px");
+                
+                Debug.setData("tile.font", new Font("Default", 1, 16));
             }
-            catch (IOException e)
+            catch (Exception e)
             {
                 e.printStackTrace();
             }

@@ -1,13 +1,7 @@
 package com.kowymaker.client.core.world;
 
-import java.awt.Font;
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
-
-import javax.imageio.ImageIO;
-
-import org.fenggui.binding.render.lwjgl.LWJGLTexture;
 
 import com.google.common.collect.Maps;
 import com.kokakiwi.maths.generator.sample.biomes.DesertBiome;
@@ -26,10 +20,12 @@ import com.kokakiwi.maths.generator.sample.params.Snow;
 import com.kokakiwi.maths.generator.sample.params.Temperature;
 import com.kokakiwi.maths.generator.sample.params.Volcano;
 import com.kokakiwi.maths.generator.world.WorldGenerator;
-import com.kowymaker.client.KowyMakerClient;
 import com.kowymaker.client.graphics.core.ClientEngine;
 import com.kowymaker.client.graphics.core.IChild;
-import com.kowymaker.spec.utils.debug.Debug;
+import com.kowymaker.client.utils.LWJGLSequencer;
+import com.kowymaker.spec.res.ResourcesManager;
+import com.kowymaker.spec.res.impl.TileFile;
+import com.kowymaker.spec.res.impl.TileFormat;
 
 public class World implements IChild
 {
@@ -38,7 +34,7 @@ public class World implements IChild
     
     private Map<Integer, Map<Integer, Chunk>> chunks  = Maps.newLinkedHashMap();
     
-    private LWJGLTexture                      texture = null;
+    private LWJGLSequencer                    sequencer;
     
     private final WorldGenerator              generator;
     
@@ -65,6 +61,19 @@ public class World implements IChild
         generator.getEnvironment().registerParameter(Oasis.class);
         generator.getEnvironment().registerParameter(Volcano.class);
         generator.getEnvironment().registerParameter(Snow.class);
+        
+        // Sequencer
+        try
+        {
+            TileFile tile = ResourcesManager.get(TileFormat.class).load(
+                    new File("res/tiles/grass.kmr"));
+            sequencer = new LWJGLSequencer(tile.getSequencer().getSequence(
+                    "normal"));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
     
     public Tile getTileByWorldCoord(int x, int y)
@@ -72,12 +81,12 @@ public class World implements IChild
         int localX = x % Chunk.width;
         int localY = y % Chunk.height;
         
-        if(localX < 0)
+        if (localX < 0)
         {
             localX += Chunk.width;
         }
         
-        if(localY < 0)
+        if (localY < 0)
         {
             localY += Chunk.height;
         }
@@ -156,14 +165,14 @@ public class World implements IChild
         this.offsetY = offsetY;
     }
     
-    public LWJGLTexture getTexture()
-    {
-        return texture;
-    }
-    
     public WorldGenerator getGenerator()
     {
         return generator;
+    }
+    
+    public LWJGLSequencer getSequencer()
+    {
+        return sequencer;
     }
     
     public HeightMap getHeightmap()
@@ -171,28 +180,10 @@ public class World implements IChild
         return generator.getEnvironment().getParameter(HeightMap.class);
     }
     
-    int n = 3;
+    int n = 2;
     
     public void update(ClientEngine engine)
     {
-        if (texture == null)
-        {
-            try
-            {
-                texture = LWJGLTexture.uploadTextureToVideoRAM(ImageIO
-                        .read(new File("res/tiles/grass2.png")));
-                
-                System.out.println("Texture loaded: " + texture.getImageWidth()
-                        + "*" + texture.getImageHeight() + "px");
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-            
-            Debug.setData("tile.font", new Font("Default", 1, 16));
-        }
-        
         tile = 0;
         
         Chunk center = getChunkByWorldCoord(offsetX, offsetY);

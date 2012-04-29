@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.lwjgl.input.Mouse;
+
 import com.kokakiwi.maths.generator.world.env.Parameter;
 import com.kokakiwi.maths.generator.world.gen.Biome;
 import com.kokakiwi.maths.generator.world.utils.MathsHelper;
@@ -51,7 +53,7 @@ public class Chunk implements IChild
                 int numZ = (int) MathsHelper.supervise(Math.round(height) + 1,
                         1, 20);
                 
-                for(int z = 0; z < numZ; z++)
+                for (int z = 0; z < numZ; z++)
                 {
                     Tile tile = new Tile(this, x, y, z, biome.getColor(worldX,
                             worldY));
@@ -118,15 +120,30 @@ public class Chunk implements IChild
     
     public void update(ClientEngine engine)
     {
+        int mouseX = Mouse.getX();
+        int mouseY = Mouse.getY();
+        
         for (int x = width - 1; x >= 0; x--)
         {
             List<List<Tile>> range = tiles.get(x);
             for (int y = height - 1; y >= 0; y--)
             {
+                boolean hovered = false;
                 List<Tile> range2 = range.get(y);
                 for (int z = range2.size() - 1; z >= 0; z--)
                 {
                     Tile tile = range2.get(z);
+                    
+                    if (!hovered && tile.contains(mouseX, mouseY))
+                    {
+                        tile.setHovered(true);
+                        hovered = true;
+                    }
+                    else
+                    {
+                        tile.setHovered(false);
+                    }
+                    
                     tile.update(engine);
                 }
             }

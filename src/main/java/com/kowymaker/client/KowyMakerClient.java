@@ -1,7 +1,12 @@
 package com.kowymaker.client;
 
 import java.io.File;
+
+import com.kowymaker.client.core.world.World;
+import com.kowymaker.client.demo.Demo;
 import com.kowymaker.client.graphics.ClientWindow;
+import com.kowymaker.client.graphics.core.ui.FPSWatcher;
+import com.kowymaker.client.graphics.core.ui.UserInterface;
 import com.kowymaker.spec.console.ConsoleOutputManager;
 import com.kowymaker.spec.utils.Configuration;
 import com.kowymaker.spec.utils.SystemUtils;
@@ -36,6 +41,10 @@ public class KowyMakerClient
         
         // Load Window
         window = new ClientWindow(this);
+        
+        // Add FPS Watcher
+        window.getApplet().getEngine().addChild(new FPSWatcher());
+        // window.getApplet().getEngine().addChild(new World());
     }
     
     public void start()
