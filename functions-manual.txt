@@ -1,0 +1,31 @@
+rgb [returns Color]
+    int r, int g, int b
+
+rgba [returns Color]
+    int r, int g, int b, int a
+
+insets [returns Spacing]
+    int top, int right, int bottom, int left
+    int topBottom, int leftRight
+    int thickness
+
+border [returns Border]
+    String type, int lineWidth
+    String type, int lineWidth, Color color
+
+url [returns URL]
+    String url
+
+background [returns Background]
+    URL url
+    Color color
+    String type, Color top, Color bottom
+    String type, Color lowerLeft, Color lowerRight, Color upperLeft, Color upperRight
+    URL url, int x, int y, int width, int height
+
+font [returns IFont]
+    String name
+    String name, String weight
+    String name, int size
+    String name, String weight, int size
+    String name, int size, String weight

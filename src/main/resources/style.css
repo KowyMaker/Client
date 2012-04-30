@@ -5,7 +5,12 @@ window
 
 window > .content
 {
-    background: url("/background.png");
+    background: url("/background.png") 10 10 50 50;
+}
+
+window#window-1 > .content
+{
+    background: gradient rgb(255, 0, 0) rgb(0, 0, 255) rgb(0, 255, 0) rgb(255, 0, 255);
 }
 
 window > .title-bar > label
@@ -14,6 +19,12 @@ window > .title-bar > label
     height: 30;
     color: rgb(255, 0, 0);
     font: "Arial" bold 20;
+}
+
+window > .title-bar > button.window-close
+{
+    color: rgb(255, 255, 255);
+    font: "Arial" bold;
 }
 
 window > .title-bar > button

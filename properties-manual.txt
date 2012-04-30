@@ -1,0 +1,71 @@
+visible
+    boolean v
+
+width
+    int w
+
+height
+    int h
+
+padding
+    Spacing insets
+    int top, int right, int bottom, int left
+    int topBottom, int leftRight
+    int thickness
+
+padding-top
+    int s
+
+padding-right
+    int s
+
+padding-bottom
+    int s
+
+padding-left
+    int s
+
+margin
+    Spacing insets
+    int top, int right, int bottom, int left
+    int topBottom, int leftRight
+    int thickness
+
+margin-top
+    int s
+
+margin-right
+    int s
+
+margin-bottom
+    int s
+
+margin-left
+    int s
+
+text-align
+    String align
+
+color
+    Color color
+
+font
+    IFont font
+    String name
+    String name, String weight
+    String name, int size
+    String name, String weight, int size
+    String name, int size, String weight
+
+background
+    Background background
+    URL url
+    Color color
+    String type, Color top, Color bottom
+    String type, Color lowerLeft, Color lowerRight, Color upperLeft, Color upperRight
+    URL url, int x, int y, int width, int height
+
+border
+    Border border
+    String type, int lineWidth
+    String type, int lineWidth, Color color

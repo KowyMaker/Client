@@ -1,8 +1,11 @@
 package com.kowymaker.client.graphics.core.ui;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.apache.commons.io.IOUtils;
 import org.fenggui.Display;
 import org.fenggui.FengGUI;
 import org.fenggui.Label;
@@ -13,6 +16,8 @@ import org.fenggui.layout.GridLayout;
 import org.fenggui.theme.ITheme;
 import org.fenggui.theme.css.CSSTheme;
 import org.fenggui.util.Point;
+
+import aurelienribon.ui.css.Style;
 
 import com.kowymaker.client.graphics.core.ClientApplet;
 import com.kowymaker.client.graphics.core.ClientEngine;
@@ -65,6 +70,21 @@ public class UserInterface implements IChild
         ITheme theme = null;
         theme = new CSSTheme(UserInterface.class.getResource("/style.css"));
         FengGUI.setTheme(theme);
+        
+        // Save manuals
+        File functionsManualFile = new File("functions-manual.txt");
+        File propertiesManualFile = new File("properties-manual.txt");
+        try
+        {
+            IOUtils.write(Style.getFunctionsManual(), new FileOutputStream(
+                    functionsManualFile));
+            IOUtils.write(Style.getPropertiesManual(), new FileOutputStream(
+                    propertiesManualFile));
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
         
         Window window = new Window();
         window.setTitle("Window #1");
