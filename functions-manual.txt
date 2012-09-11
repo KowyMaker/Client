@@ -16,16 +16,18 @@ border [returns Border]
 url [returns URL]
     String url
 
-background [returns Background]
-    URL url
-    Color color
-    String type, Color top, Color bottom
-    String type, Color lowerLeft, Color lowerRight, Color upperLeft, Color upperRight
-    URL url, int x, int y, int width, int height
-
 font [returns IFont]
     String name
     String name, String weight
     String name, int size
     String name, String weight, int size
     String name, int size, String weight
+
+background-color [returns Background]
+    Color color
+    String type, Color top, Color bottom
+    String type, Color lowerLeft, Color lowerRight, Color upperLeft, Color upperRight
+
+background-image [returns Background]
+    URL url
+    URL url, int x, int y, int width, int height

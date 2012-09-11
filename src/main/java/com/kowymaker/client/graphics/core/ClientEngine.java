@@ -258,7 +258,7 @@ public class ClientEngine implements Runnable
         
         public Configuration(int width, int height)
         {
-            this(width, height, Color.WHITE);
+            this(width, height, Color.BLACK);
         }
         
         public Configuration(int width, int height, Color background)

@@ -58,14 +58,18 @@ font
     String name, int size, String weight
 
 background
-    Background background
-    URL url
+    Background color
     Color color
     String type, Color top, Color bottom
     String type, Color lowerLeft, Color lowerRight, Color upperLeft, Color upperRight
+    Background image
+    URL url
     URL url, int x, int y, int width, int height
 
 border
     Border border
     String type, int lineWidth
     String type, int lineWidth, Color color
+
+border-radius
+    int radius

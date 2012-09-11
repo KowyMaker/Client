@@ -25,7 +25,7 @@
 	<repositories>
 		<repository>
 			<id>kiwi-jenkins-repo</id>
-			<url>http://ci.kokaelkiwi.eu:8080/plugin/repository/everything/</url>
+			<url>http://ci.kokaelkiwi.eu/plugin/repository/everything/</url>
 		</repository>
 	</repositories>
 	<build>

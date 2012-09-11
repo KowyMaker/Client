@@ -5,7 +5,7 @@ window
 
 window > .content
 {
-    background: url("/background.png") 10 10 50 50;
+    background: url("/background.png") 30 30 30 30;
 }
 
 window#window-1 > .content
@@ -44,14 +44,4 @@ textfield
 {
     padding: 3;
     background: rgb(255, 255, 255);
-}
-
-menubar
-{
-    background: rgb(128, 255, 255);
-}
-
-menu
-{
-    background: rgb(0, 0, 128);
 }
